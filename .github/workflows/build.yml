@@ -1,0 +1,31 @@
+name: Build samp_bcrypt (glibc lama)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Build di dalam container Ubuntu 16.04 i386
+        run: |
+          mkdir -p "$PWD/out"
+          docker run --rm -v "$PWD/out:/out" i386/ubuntu:16.04 bash -c '
+            set -e
+            apt-get update
+            apt-get install -y curl git build-essential ca-certificates pkg-config
+            curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            . /root/.cargo/env
+            git clone --depth 1 https://github.com/Sreyas-Sreelal/samp-bcrypt /src
+            cd /src
+            cargo build --release
+            cp target/release/libsamp_bcrypt.so /out/samp_bcrypt.so
+            echo "--- glibc yang dibutuhkan:"
+            objdump -T /out/samp_bcrypt.so | grep -o "GLIBC_[0-9.]*" | sort -uV
+          '
+
+      - name: Upload hasil
+        uses: actions/upload-artifact@v4
+        with:
+          name: samp_bcrypt-so
+          path: out/samp_bcrypt.so
