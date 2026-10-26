@@ -14,7 +14,7 @@ jobs:
             set -e
             apt-get update
             apt-get install -y curl git build-essential ca-certificates pkg-config
-            curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-host i686-unknown-linux-gnu
             . /root/.cargo/env
             git clone --depth 1 https://github.com/Sreyas-Sreelal/samp-bcrypt /src
             cd /src
